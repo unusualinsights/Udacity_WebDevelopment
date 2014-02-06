@@ -1,0 +1,110 @@
+
+World Wide Web
+--------------
+
+(also known as "the Web" or "WWW" as an abbreviation)
+
+"World Wide Web" = graph with files (mainly HTML) as nodes (vertices) and
+  edges called "hyperlinks" or "links" for short
+
+Files can be any file - document, music, etc.; but HTML is the main type of
+  file on the Web.
+
+WWW was invented in the 1990s.
+
+As of the creation of this Udacity course, the Web has ~30 billion pages.
+
+
+Inline vs. block tags in HTML
+-----------------------------
+
+Block tags form an invisible box around their contents.
+Inline tags don't.
+
+<b>, <em>, <img>, <br> are all inline tags in HTML, but
+
+<p> is a block tag.
+
+
+<span> vs. <div>
+----------------
+
+<span> is an inline tag
+<div> is a block tag
+
+Note that "<div>A</div>." will cause the "." to appear on a subsequent line,
+after the line containing "A".
+
+
+Complete HTML document structure
+--------------------------------
+
+<!DOCTYPE HTML> - doctype, far simpler now that we're using HTML 5
+<html>
+<head>
+   <title>Title!</title>
+</head>
+<body>
+<b>content</b>
+</body>
+</html>
+
+
+URLs (Uniform Resource Locators)
+--------------------------------
+
+http://www.udacity.com /
+----|  ---------------|-
+ |            |        |
+ |            |        |
+ V            V        V
+Protocol     Host     Path
+
+
+Query Parameters (a.k.a. "GET Parameters")
+----------------
+
+http://example.com/foo?p=1&q=neat
+                      -----------
+                         Query
+
+Query/GET parameters are:
+- Name: p  Value: 1
+- Name: q  Value: neat
+
+
+Fragments
+---------
+
+http://www.example.com/foo#fragment
+                          ---------
+
+The fragment is NOT SENT TO THE SERVER!
+
+
+Port
+----
+
+http://localhost:8000/
+                 ----
+
+Default port is 80
+
+
+Quiz for URL Decomposition
+--------------------------
+
+http://example.com:80/toys?p=foo#blah
+
+host: example.com
+protocol: http
+fragment: #blah
+query: ?p=foo
+port: 80
+
+Note that the preceding symbols are part of the field, i.e.,
+the "?" is part of the query and the "#" is part of the fragment.
+This is my own observation about the definition of these terms,
+not something the course or instructor emphasized.
+
+
