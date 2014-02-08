@@ -1,0 +1,53 @@
+
+Preparatory Steps
+-----------------
+
+Install Google App Engine and Python 2.7 as described in the Google App Engine
+installation web pages.
+
+I don't remember if there were any special steps beyond this; just ensure that
+your Cygwin path (check it with the command "echo $PATH") contains something
+like "/cygdrive/c/Program Files (x86)/Google/google_appengine", so you can run
+the console (command-line) version of Google App Engine, which I think is
+simpler than the GUI version.
+
+Also, python may not be in your path.  To have Cygwin add python to your path
+automatically when it starts (without altering your system path in general in
+Windows), add the line "export PATH=/cygdrive/c/Python27:$PATH" to your
+.bashrc file in your $HOME directory.
+
+Then close that Cygwin window and open a new one.  Type "python --version" to
+see if python is now in your Cygwin bash shell's path.  It should output
+something that looks like "Python 2.7.6".
+
+Alternatively, a handy one-line command for adding something to the PATH in
+your .bashrc file is:
+
+echo export PATH=/cygdrive/c/Python27:\$PATH >> ~/.bashrc
+
+(Note the "\$" is there in the command above, to indicate the "$" symbol as a
+ part of the string to be echoed, rather than some other UNIX symbol.  The >>
+ symbol tells the shell to append the echoed string,
+ "export PATH=/cygdrive/c/Python27:$PATH", to your .bashrc file.)
+
+(Reference: https://stackoverflow.com/questions/13091522/bin-env-python-no-
+                    such-file-or-directory-windows-through-git-bash-trying-to)
+
+In the Udacity exercise, once you create helloworld.py and app.yaml as
+specified in the instructions, the command that worked for me in Cygwin for
+running the Python hello world program from the "helloworld" folder was:
+
+/cygdrive/c/Python27/python "`cygpath -w /cygdrive/c/Program\ Files\ \(x86\)/Google/google_appengine/dev_appserver.py`" --port 8888 .
+
+Note, you have to hit [Enter] TWICE to make this work!!
+
+Then, in a web browser, navigate to "localhost:8888" and you will see
+"Hello, Udacity!" being displayed.
+
+See the "helloworld" folder for the Python programs for this homework
+assignment.
+
+Note that every time you hit refresh, the "GET / HTTP/1.1" request shows up in
+the output of the running Python program.
+
+
