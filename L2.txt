@@ -1,0 +1,606 @@
+
+HTML Forms
+----------
+
+See example01_forms_intro/play.html:
+
+<form>
+	<input name="q">
+</form>
+
+This HTML file, when loaded in a browser, has some interesting behavior.  The
+web page will just have a single text box in it.  If you type some text in the
+text box (such as "what's up?") and hit Enter, you'll notice the URL changes
+from:
+
+file:///...../play.html
+
+to
+
+file:///...../play.html?q=what's+up%3F
+
+The "+" representing a space and "%3F" representing a question mark is known
+as URL escaping or form escaping or form encoding.
+
+
+Now see example01_forms_intro/play2.html:
+
+<form>
+	<input name="q">
+	<input type="submit">
+</form>
+
+The second "input" line causes a "Submit" button to appear in the web page if
+you load play2.html in a browser.  Clicking that button causes the same thing
+as hitting Enter in the text box.
+
+
+In example01_forms_intro/play3.html:
+
+<form action="http://www.google.com/search">
+	<input name="q">
+	<input type="submit">
+</form>
+
+Loading play3.html into a browser, when you type text into the text box, hit
+Submit or press Enter, the browser loads Google search results for the text you
+typed.
+
+
+Content Type
+------------
+
+See example02_forms/helloworld.py
+
+Two changes were made from example01:
+
+1) We added the <form> ... </form> text from play3.html as a string called
+   "form"
+2) We changed the print statement's argument from "Hello, Udacity!!" to
+   form.
+
+Run this in Google App Engine Launcher, port 8888.
+Then load "localhost:8888" in the browser and see what happens.
+
+The HTML code for the form is displayed in the browser.  Why?
+
+Because the Content-Type in the HTTP response in the helloworld.py file was
+set to "text/plain".
+
+If we make a third change, as shown in example03_forms/helloworld.py:
+
+3) Comment out the 'Content-Type' line
+
+Then, if we launch this new application in the Google App Engine Launcher at
+port 8888 and reload the browser window pointing to "localhost:8888", we'll see
+the browser displaying the form (the text box and Submit button) as intended.
+
+
+Adding Another HTTP Request Handler to the Web Application (Python Program)
+---------------------------------------------------------------------------
+
+See example04_forms/helloworld.py.
+
+From the example03_forms/helloworld.py file, we change the Google search
+path to "/testform", we add a "TestHandler" line to
+the bottom of the file in the "application =" section and a "TestHandler"
+class to the program.  The TestHandler class takes whatever data is in the
+HTTP request's "q" parameter and writes it to the browser screen.  When we
+launch the web application, type some text into the text box in the browser,
+and hit Submit, whatever text we entered into the text box will be displayed
+on the browser screen.
+
+Let's review this again in steps:
+- We type "hello world" into the text box whose name is "q".
+- We press Enter or click the Submit button.
+- The URL changes from localhost:8888 to localhost:8888/testform?q=hello+world
+- The parameter named "q" and its value "hello+world" are sent via an HTTP GET
+  request to our locally running web server that is listening on port 8888,
+  with the path /testform being requested in the HTTP GET request.
+- The web application (the Python program) invokes the TestHandler when the
+  /testform path is requested by an HTTP GET request.
+- The TestHandler's "get" method is called to handle the HTTP GET request.
+- This "get" method first reads the value of the parameter named "q" in the
+  HTTP GET request and stores that value in a variable "q" in the python
+  program.
+- Next, that "get" method in the TestHandler writes the value of the variable
+  "q" out to the web page.
+
+We can go a bit deeper.  When we first run the python web application, our
+local web server is listening on port 8888 for HTTP GET requests.
+- When we open our browser and navigate to "localhost:8888" and press Enter,
+  the browser sends the request "GET / HTTP/1.1" to our running Python web
+  application.
+- When the Python program has a GET request sent to the path "/", the Python
+  program, as specified at the bottom of the program, invokes the "MainPage"
+  class, whose "get" function is called in reaction to this GET request.
+- The MainPage class's "get" method just writes the form to the web page.
+
+Now, when we type "hello there" in the text box on the web page and press
+Enter or hit Submit, the following happens:
+- A GET request is sent to our program:
+  "GET /testform?q=hello+there HTTP/1.1"
+- Our Python web application program, as described above, reads the path
+  requested by this GET request, invokes the TestHandler class, and calls its
+  "get" method.  That "get" method receives the parameter q and its value and
+  displays that value (the string "hello world" we entered in the text box)
+  to the web page.
+
+
+Example 5
+---------
+In example05_forms/helloworld.py, we comment out the two lines of code from
+examploe04_forms/helloworld.py's TestHandler's get method and add the two
+lines:
+
+	self.response.headers['Content-Type'] = 'text/plain'
+	self.response.out.write( self.request )
+
+If we now run this web app, load localhost:8888 in the web browser, type
+"udacity is awesome" in the text box and hit Submit, the entire HTTP request
+that was sent to our web app is displayed on the screen:
+
+GET /testform?q=udacity+is+awesome HTTP/1.1
+Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8
+Accept-Language: en-US,en;q=0.5
+Content-Type: ; charset="utf-8"
+Content_Length: 0
+Dnt: 1
+Host: localhost:8888
+Referer: http://localhost:8888/
+User-Agent: Mozilla/5.0 (Windows NT 6.1; WOW64; rv:26.0) Gecko/20100101
+            Firefox/26.0
+X-Appengine-Country: ZZ
+
+
+Example 6: The Method Attribute of the Form Element
+---------------------------------------------------
+
+From Example 5, we comment out those two new lines and uncomment the two
+original lines in the Testhandler's get function, restoring the program to be
+identical (other than the two uncommented lines) to Example 4.
+
+Then, we add method="post" to the <form> element in the "form" string at the
+top of helloworld.py.
+
+Note that if the "method" attribute is not specified, a <form> element is by
+default using method="get".  That's what we've seen so far.
+
+When we run this web app, when we type some text and hit Submit, the HTTP
+request sent to our app is now "POST /testform HTTP/1.1", instead of the
+equivalent GET request from before; and also there is no query in this request
+like we had in the GET request before (i.e., ?q=udacity+is+awesome).
+
+The result of clicking Submit is that we see an error displayed:
+
+405 Method Not Allowed
+The method POST is not allowed for this resource.
+
+By "resource", the message is referring to "/testform", which is what our URL
+becomes after we click Submit: "localhost:8888/testform".  In other words,
+when we click Submit, our web page (the HTML form) sends an HTTP POST request
+to our web app at the path "/testform", but a request to path "/testform"
+invokes our TestHandler, which has no post method; that's what the error 405
+Method Not Allowed means: no post function exists in our TestHandler class.
+
+If we change the word method name in the TestHandler class from "get" to
+"post" and then re-run the web app and type "udacity is awesome" and hit
+Submit, we notice in the command line that the same POST request is sent to
+our web app to the "/testform" path (POST /testform HTTP/1.1).  Then we see
+that in our web page, the phrase "udacity is awesome" is printed to the page.
+Interesting however that even though "q=udacity+is+awesome" never seems to
+appear in our POST request or in the URL of the /testform web page, the
+parameter q and its value still somehow made it into the post method of the
+TestHandler class, and the post method printed that value of the parameter q
+that it got from the HTTP POST request to the web page.
+
+Where did the "q=udacity+is+awesome" go?  It's not in our URL or in the request
+line itself.  If we comment out the two lines of the TestHandler's post method
+and uncomment the two lines below that to write the request out to the web page
+again like before, we see that the full HTTP POST request looks like this:
+
+POST /testform HTTP/1.1
+Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8
+Accept-Language: en-US,en;q=0.5
+Content-Length: 20
+Content-Type: application/x-www-form-urlencoded; charset="utf-8"
+Content_Length: 20
+Content_Type: application/x-www-form-urlencoded
+Dnt: 1
+Host: localhost:8888
+Referer: http://localhost:8888/
+User-Agent: Mozilla/5.0 (Windows NT 6.1; WOW64; rv:26.0) Gecko/20100101
+            Firefox/26.0
+X-Appengine-Country: ZZ
+
+q=udacity+is+awesome
+
+In other words, "q=udacity+is+awesome" occurs *after* the HTTP request headers.
+
+This is a difference between GET and POST requests:
+- GET requests include the parameters in the URL / path
+- POST requests include the parameters after the request headers
+
+Note two quirks:
+- The header name "Referer" is a misspelling of the English word "Referrer".
+  The header name was set this way 20 years ago and has become the standard,
+  so now we always have to misspell it!
+- In the POST request above, note some headers are repeated; this is because
+  what we print to the web page is the *python representation of* the request,
+  which is a little glitchy, but not a big deal.
+
+
+GET vs. POST
+------------
+
+GET:                                       POST:
+- parameters are in URL                    - parameters in request body
+- used for fetching documents              - used for updating data
+- shouldn't change the server              - OK to change the server
+- maximum URL length (e.g., 2000           - No max length by default, but
+  characters in Internet Explorer)           servers usually limit size to much
+                                             more than 2000 chars (usu few MB)
+- OK to cache (since doesn't change        - not OK to cache (since can change
+  server)                                    server each time it's sent)
+
+
+Forms: Passwords (Example 7)
+----------------------------
+Going back to our HTML form code:
+
+<form>
+	<input name="q">
+	<input type="submit">
+</form>
+
+We'll add type="text" to the first input element - this is actually the
+default type for an input element (a text box).  It's recommended to put types
+explicitly into input elements just to be clear.
+
+<form>
+	<input type="text" name="q">
+	<input type="submit">
+</form>
+
+Nothing interesting here.
+But let's change the type of the first input element to "password":
+
+<form>
+	<input type="password" name="q">
+	<input type="submit">
+</form>
+
+Note that if we load this form in a browser and type some stuff in the text
+box, the text is all obscured, but then when we click Submit, the form (which
+by default uses the "get" method) sends an HTTP GET request to our local web
+server, with whatever we typed in the text box being the value of the
+parameter q in the URL of the resulting web page, which of course ends up in
+the path of the GET request that is sent.  The obscured text we entered into
+the password box is sent as plain text in the path of the URL / GET request!
+
+If we change the HTML file in example 7 to have type "checkbox" for the first
+input element:
+
+<form>
+	<input type="checkbox" name="q">
+	<input type="submit">
+</form>
+
+Then, instead of a text box, a checkbox appears in the loaded web page.  If we
+check the checkbox and click Submit, the parameter "?q=on" shows up in the
+URL.  If we uncheck the checkbox and click Submit, no parameter appears at all
+in the URL.  Browsers are not guaranteed to all behave like this - some may
+still include a "?" with no parameters, or maybe have "?q=off" in the URL, or
+something else.  So, Steve recommends checking for "?q=on", and otherwise do
+something else (not specifically check for "" or "?" or "?q=off").
+
+We can add multiple checkboxes:
+
+<form>
+	<input type="checkbox" name="q">
+	<input type="checkbox" name="r">
+	<input type="checkbox" name="s">
+	<br>
+	<input type="submit">
+</form>
+
+Nothing interesting to really add about this form's behavior.
+
+
+Groups
+------
+But let's change these to radio buttons:
+
+<form>
+	<input type="radio" name="q">
+	<input type="radio" name="r">
+	<input type="radio" name="s">
+	<br>
+	<input type="submit">
+</form>
+
+If we load this in the browser, note that the radiobuttons don't behave as
+intended - i.e., we can select more than one of them, and also can't unselect
+any of them.
+
+To get the intended behavior, we can give all radiobuttons the same *name*:
+
+<form>
+	<input type="radio" name="q">
+	<input type="radio" name="q">
+	<input type="radio" name="q">
+	<br>
+	<input type="submit">
+</form>
+
+Now, this works as intended: only one radiobutton can be selected at a time.
+But, when we hit Submit, no matter which radiobutton was selected, it will
+say "?q=on".  So we don't have any information about *which* radiobutton was
+selected.  To fix this, we can use the value parameter:
+
+<form>
+	<input type="radio" name="q" value="one">
+	<input type="radio" name="q" value="two">
+	<input type="radio" name="q" value="three">
+	<br>
+	<input type="submit">
+</form>
+
+Now, if we select the second radiobutton and click Submit, the URL will say
+"?q=two" instead of "?q=on".  So I guess that means the input element's
+default value (output value) for a type "radio" input element is "on" if it is
+selected.
+
+To add text labels to the radiobuttons, wrap them in <label> elements:
+
+<form>
+	<label>
+		One
+		<input type="radio" name="q" value="one">
+	</label>
+	<label>
+		Two
+		<input type="radio" name="q" value="two">
+	</label>
+	<label>
+		Three
+		<input type="radio" name="q" value="three">
+	</label>
+</form>
+
+
+Dropdown Element (Example 9)
+----------------------------
+<form>
+	<select name="q">
+		<option>one</option>
+		<option>two</option>
+		<option>three</option>
+	</select>
+
+	<br>
+	<input type="submit">
+</form>
+
+By default, when we select one of these options from the dropdown list in the
+browser and click Submit, the text of the chosen element will be the value of
+the q parameter in the URL in the GET request.  If we want to control the
+value of q depending on what item in the dropdown list is selected, we can use
+the "value" attribute:
+
+<form>
+	<select name="q">
+		<option value="1">the number one</option>
+		<option value="2">the number two</option>
+		<option value="3">the number three</option>
+	</select>
+
+	<br>
+	<input type="submit">
+</form>
+
+So, when we select "the number one" from the list in the web page, the
+resulting URL will end with "?q=1", since we set the value of that list
+element to "1".
+
+
+Validation on Server Side
+-------------------------
+Just because we have checkboxes or radiobuttons or dropdown lists that limit
+the possible values of q sent to our web server, doesn't mean that our server
+doesn't need to handle any other possible q values.  For instance, some
+malicious user could type a URL with "?q=broken" and send it to our server;
+our server needs to handle these invalid parameter values properly and not
+crash or something when an unexpected parameter value arrives.  A malicious
+user could also send "?q=[a megabyte of trash]" or something.
+
+
+Example 10: Handling Posts
+--------------------------
+Back to a helloworld.py web application.  We removed the TestHandler class
+and /testform path completely, and only have the "/" path and MainPage class.
+Changed the form to have a triplet of text inputs for month, day, and year
+with labels.  If we run this web application and load it in the browser and
+enter some data and click Submit, we get an error 405 Method Not Allowed,
+because the MainPage class, which is invoked when our GET request to "/" is
+sent to our web server, has no post method.  So, we add such a post method.
+
+Then, it works - our form does whatever the post method we just wrote in
+the MainPage class does!
+
+Now, we want to handle cases where the user enters bad data - invalid month,
+day, or year.  Ways to do this are:
+- Use dropdowns to limit what the user can enter through the web page itself
+- Verify what users enter and complain if the data is bad
+
+The second approach is crucial: even if we use dropdowns, the user can still
+enter bad data into the URL directly, or send a GET request with a bad
+parameter value.
+
+
+Python Dictionary Mapping First 3 Letters of Month Names to Full Month Names
+----------------------------------------------------------------------------
+
+See Example 11.
+
+month_abbvs = dict( ( m[ :3 ].lower(), m ) for m in months )
+
+The ":3" index refers to the "first three elements" of the string m.
+The dictionary is unordered according to Steve, so it seems to be basically a
+hashtable, which maps 'jan' to 'January', 'feb' to 'February', etc.
+
+To obtain the value (full month name) from the key (first three letters), we
+simply call:
+
+month_abbvs.get( 'jan' )
+
+for instance, to get 'January' as the returned value.
+
+
+Validation Workflow
+-------------------
+
+              GET form
+========= -----------------> ==========
+=========    form data       ==========
+== YOU == <----------------- = SERVER =
+=========    POST form       ==========
+========= -----------------> ==========
+          ^            validate
+  ________|             /   |
+ |                     /    |
+ |                    L     |
+ |       thanks!            |
+ |  <-------------- good    |
+ |                          |
+ |                          V
+ |                         bad
+  <--------------------------
+
+Need to remember to do three things:
+- Verify the user's input
+- On error, render form again
+- Include error message
+
+See helloworld.py for how this is done.
+
+To print the error messages, we added a <div>%(error)s</div> to our HTML form
+code string and created a write_form function in the MainPage class that takes
+an optional error string as input.  We set the <div> element to use a little
+CSS phrase to indicate that its contents should be written as red text.
+
+It would be nice if, when we throw an error, we leave the user's previously
+entered text in the fields so the user knows what not to enter.  To do this,
+we add some more string substitutions to our HTML form code string in the
+python web app program, by setting a default "value" attribute for each of
+the three input elements:
+
+<input type="text" name="month" value="%(month)s">
+<input type="text" name="day" value="%(day)s">
+<input type="text" name="year" value="%(year)s">
+
+We add some more code (see helloworld.py) to implement this functionality.
+The python web application appears to run fine in the browser.
+However, if we enter a string into the Month box that contains a quote (")
+  followed by some other stuff, the quote and everything after it disappears!
+Even worse, if we enter text like
+
+">derp
+
+The HTML form will substitute whatever that string is right into the HTML form
+code, so in this case:
+
+<input value="%(month)s">
+
+will become
+
+<input value="">derp">
+
+This could allow someone to enter not just random text, but full-on HTML code
+into our text boxes, messing up our whole HTML form!
+
+The solution to this problem is to escape 4 HTML characters:
+   > ---> &gt;
+   < ---> &lt;
+   " ---> &quot;
+   & ---> &amp;
+
+
+Redirection
+-----------
+
+But note that we have two other problems:
+- can't share the success link - it's just the homepage of your web app, but
+  if you send that link to someone else (assuming you uploaded it to the web),
+  they wouldn't be able to see the success link; only the original home page
+  of your web app
+- can't reload the success page without an annoying message about whether you
+  want to resend the form data
+
+That is, our current scenario is:
+
+                 GET
+========= -----------------> ==========
+=========                    ==========
+=========     form HTML      ==========
+========= <----------------- ==========
+=========                    ==========
+== YOU ==    POST answer     = SERVER =
+========= -----------------> ==========
+=========                    ==========
+=========   Success HTML     ==========
+========= <----------------- ==========
+=========                    ==========
+
+Imagine that instead of just showing a successful entry of month / date / year,
+we were showing a successful blog post.  We don't want to keep sending POST
+requests to the server and make the server validate our blog entry every time
+we just want to view the result of our successful blog post - once we've
+achieved success, we want to just see the result without the server doing any
+more work!
+
+So to get around that, we change the last communication in the diagram above,
+so that instead of a "Success HTML", our server sends back a "redirect" to
+another stored HTML page that is our "Success HTML", which can be fetched with
+a GET request instead of a POST request.
+
+                 GET
+========= -----------------> ==========
+=========                    ==========
+=========     form HTML      ==========
+========= <----------------- ==========
+=========                    ==========
+=========    POST answer     ==========
+========= -----------------> ==========
+== YOU ==                    = SERVER =
+=========      Redirect      ==========
+========= <----------------- ==========
+=========                    ==========
+=========    GET Success     ==========
+========= -----------------> ==========
+=========                    ==========
+=========    Success HTML    ==========
+========= <----------------- ==========
+
+Basically, I think the key difference here, which wasn't emphasized in the
+lecture, is that instead of generating a new Success HTML page to send back
+to the browser after the POST answer, the server would, upon receiving the
+POST answer, update some HTML page that resides on it (such as a permalink to
+the blog homepage or a "thanks for registering" page) if needed, and then when
+the browser sends the "GET Success" request, that HTML page is sent back to
+the browser.
+
+To implement this redirect mechanism, we need to:
+- make a "Thanks" handler
+- add the /thanks URL
+- redirect to the /thanks URL
+
+Indeed, now if we run the Example 12 python web app in Cygwin (by just typing
+"runwebapp" in a Cygwin shell like I've been doing all this time, but in the
+example12_redirect folder) and then open localhost:8888 in the browser, we see
+that upon failed entry, the app still behaves the same, giving us an error
+message, but upon success, we get redirected to the localhost:8888/thanks URL,
+which is a static success HTML page that we can reload however many times we
+want, without the annoying message about resending form data to the server!
+
+
