@@ -108,3 +108,170 @@ This is my own observation about the definition of these terms,
 not something the course or instructor emphasized.
 
 
+HTTP Get Request
+----------------
+
+When connected to the host server example.com, to fetch the following page
+from the server:
+
+http://www.example.com/foo
+
+Our browser (or a program we write) would issue the following GET request:
+
+GET       /foo    HTTP/1.1   <--- request line
+(method) (path)   (version)
+                        ^
+                        |
+                      can also be 1.0, but 1.1 is most common
+
+NOTE: host name example.com is not in the request line, because we are already
+connected to the host before issuing the GET request.
+
+
+Example: the request line to GET the following URL
+
+         http://example.com/foo/logo.png?p=1#tricky
+
+is
+
+         GET    /foo/logo.png?p=1    HTTP/1.1
+
+because, as noted earlier, the fragment "#tricky" is never sent to the server!
+
+
+HTTP Request
+------------
+When a request for a page is sent to a host server from a client computer,
+a GET request, followed by a number of "headers", are sent to the host server.
+Each header has the structure "Name: Value".
+
+Some common headers are listed below, in the following example HTTP request:
+
+GET /foo?p=1 HTTP/1.1
+Host: www.example.com
+User-Agent: chrome v1.7
+
+The "Host" header:
+Note the strangeness of the "Host: www.example.com" header.  Why are we sending
+the name of the host server to the host server in this HTTP request?  That's
+like saying, "Hey, Steve, what's your name?"  We do this because a single
+host server can host multiple websites.  For example, Udacity.com is hosted on
+a Google App Engine server, which hosts many other websites.  It's useful,
+then, to send the particular website whose page you're requesting, in the
+header to the host server, so it knows what website's data to retrieve in
+response to your GET request.
+
+The "User-Agent" header:
+This header tells the host server what kind of browser or machine is sending
+this GET request.  With Reddit, Steve found that many User-Agents would
+access his site, mostly just to retrieve data from Reddit that they would use
+to explain how Reddit works, etc., all good stuff.  But Googlebot, Google's
+web crawler that indexes pages for their search engine, was pummeling Reddit
+with tons of GET requests to the point that their website was slowed down.
+Since Google was honest and indicated in the User-Agent header that the GET
+requests were coming from the Googlebot, Reddit's developers could simply
+rate-limit GET requests from the Googlebot User-Agent to slow them down a bit.
+Google's feelings weren't hurt since Googlebot could still access and index
+Reddit, but they were just slowed down a bit to make Reddit's site work faster.
+
+Unfortunately, the User-Agent header is also used maliciously by many people.
+If there is a particular User-Agent that is slowing down a site, the developers
+hosting the site can do something to limit the frequency or number of GET
+requests issued by that particular User-Agent.  But if the User-Agent is
+dishonest and misrepresenting the machine issuing the GET requests, this makes
+it much more difficult for a hosting service to manage.
+
+Example: valid headers:
+
+Host: www.hipmunk.com
+User-Agent: ignore me I'm a spammer
+i-made-this-up: whatever
+
+Example: invalid headers:
+
+host www.example.com <--- invalid because there's no colon between Name & Value
+User Agent: Chrome <--- invalid because there's a space in the Name field
+
+
+HTTP Response
+-------------
+
+Request: GET /foo HTTP/1.1 <-- request line
+
+Response: HTTP/1.1       200             OK        <-- status line
+          (version) (status code) (reason phrase)
+
+Common status codes and corresponding reason phrases:
+200 OK
+302 Found
+404 Not found
+500 Server Error
+
+Note the first digit in the status code has a meaning:
+2 - document was found
+3 - need to do something different to find the document
+4 - there was an error on the browser (client) side
+    (e.g., the document doesn't exist)
+5 - there was an error on the server side
+
+HTTP response is also accompanied with headers.  Some common ones are shown
+below.
+
+HTTP/1.1 200 OK
+Date: Tue Mar 2012 04:33:33 GMT
+Server: Apache/2.2.3
+Content-Type: text/html;
+Content-Length: 1539
+
+Steve omits or makes up something in the "Server" header, because this header
+is just giving free information to would-be hackers.
+
+Content-Type is common, and other types could include img/png or img/gif (not
+sure of the exact formatting here).
+
+Content-Length is not strictly required but is often included, just to tell the
+browser how much data it should have expected to receive for GETting this
+document.  This isn't strictly required because the browser will know when the
+document is done being sent to it anyway since the connection will close.
+
+
+Exercise for Example HTTP Request & Response
+--------------------------------------------
+The correct answer to this exercise seems to change often.  What works as
+of Feb 8, 2014, is:
+
+telnet www.example.com 80
+
+GET / HTTP/1.1
+Host: www.example.com
+
+This returns "HTTP/1.1 200 OK", other HTTP response headers, and then the
+entire HTML document for that page www.example.com/, and then a final message
+"Connecton closed by foreign host."
+
+
+Last-Modified Header
+--------------------
+One header in the HTTP response is the "Last-Modified" header, which tells us
+when the page we requested was last modified.  This tells our browser that it
+doesn't need to re-load the page if it has already loaded that page (into its
+cache?) subsequent to this date.
+
+
+Servers
+-------
+Purpose: respond to HTTP requests
+
+Types of HTTP requests:
+- Static
+  . Pre-written file
+  . Image
+- Dynamic
+  . made on the fly by programs called *WEB APPLICATIONS*
+
+A web application:
+- lives on a web server
+- speaks HTTP
+- creates content to send back to your browser
+
+

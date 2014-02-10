@@ -33,11 +33,15 @@ echo export PATH=/cygdrive/c/Python27:\$PATH >> ~/.bashrc
 (Reference: https://stackoverflow.com/questions/13091522/bin-env-python-no-
                     such-file-or-directory-windows-through-git-bash-trying-to)
 
+
+Getting the Problem Set 1 Exercise Running
+------------------------------------------
+
 In the Udacity exercise, once you create helloworld.py and app.yaml as
 specified in the instructions, the command that worked for me in Cygwin for
 running the Python hello world program from the "helloworld" folder was:
 
-/cygdrive/c/Python27/python "`cygpath -w /cygdrive/c/Program\ Files\ \(x86\)/Google/google_appengine/dev_appserver.py`" --port 8888 .
+python "`cygpath -w /cygdrive/c/Program\ Files\ \(x86\)/Google/google_appengine/dev_appserver.py`" --port 8888 .
 
 Note, you have to hit [Enter] TWICE to make this work!!
 
@@ -49,5 +53,39 @@ assignment.
 
 Note that every time you hit refresh, the "GET / HTTP/1.1" request shows up in
 the output of the running Python program.
+
+To make the above command easier to run and not have to type it over and over,
+we can create a script in the home directory "~" called "run_python_web_app".
+Make sure the file is executable ("chmod a+x ~/run_python_web_app") if needed,
+and in the file, put #!/bin/bash and then the above command, python "`cygpath
+etc. as the second line, then save and exit.
+
+Then, in the ~/.bashrc file, add a line at the end or in the "alias" section
+that says "alias runwebapp='~/runwebapp'" (omit the double quotes here, but
+keep the single quotes).
+
+Then, close the Cygwin shell and open a new one so the new .bashrc file is
+loaded with the runwebapp alias fully functional.  From now on, we can just
+type "runwebapp" in any folder to make the Python web application in that
+folder run and listen for GET requests on port 8888.
+
+
+Uploading the Web App We Just Created
+-------------------------------------
+I can't get appcfg.py to work from the command line.
+So, using the Google App Engine Launcher GUI application in Windows, I added
+this existing application's folder, with port 8888, and ran it and then loaded
+"localhost:8888" in the browser to make sure it worked.
+
+Then, I just clicked Deploy, enter username and password for Google, and done!
+Then go to math-dev.appspot.com to see the application's result.
+
+I think this command will also work, but I was not sure if the password is
+sent over HTTPS or just HTTP (stackoverflow user claims https is default, but
+not sure):
+
+python -u "`cygpath -w /cygdrive/c/Program\ Files\ \(x86\)/Google/google_appengine/appcfg.py`" --no_cookies --noisy --email=malayaleescholar@gmail.com --passin update "`cygpath -w /cygdrive/c/ctj/prog/udacity_webdev/helloworld/`"
+
+(Then enter password and press [Enter] when prompted.)
 
 
